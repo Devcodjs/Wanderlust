@@ -1,0 +1,103 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row">
+  <div class="col-8 offset-2">
+    <h3 class="my-4">Create New Listing</h3>
+    <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+      
+      <!-- Error Display -->
+      <% if (typeof error !== 'undefined' && error.length) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+
+      <!-- Title -->
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input id="title" name="listing[title]" class="form-control" 
+               value="<%= typeof listing !== 'undefined' ? listing.title : '' %>" 
+               required>
+        <div class="invalid-feedback">Please provide a title</div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="listing[description]" class="form-control" rows="3" 
+                  required><%= typeof listing !== 'undefined' ? listing.description : '' %></textarea>
+        <div class="invalid-feedback">Please provide a description</div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-3">
+        <label for="image" class="form-label">Property Image</label>
+        <input id="image" name="image" type="file" class="form-control">
+        <div class="invalid-feedback">Please select an image (JPEG/PNG)</div>
+      </div>
+
+      <!-- Price & Country -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input id="price" name="listing[price]" type="number" class="form-control" 
+                   value="<%= typeof listing !== 'undefined' ? listing.price : '' %>" 
+                   min="0" required>
+          </div>
+          <div class="invalid-feedback">Please provide a valid price</div>
+        </div>
+
+        <div class="col-md-8">
+          <label for="country" class="form-label">Country</label>
+          <input id="country" name="listing[country]" class="form-control" 
+                 value="<%= typeof listing !== 'undefined' ? listing.country : '' %>" 
+                 required>
+          <div class="invalid-feedback">Please provide a country</div>
+        </div>
+      </div>
+
+      <!-- Location (Critical for Geometry) -->
+      <div class="mb-4">
+        <label for="location" class="form-label">Exact Location</label>
+        <input id="location" name="listing[location]" class="form-control" 
+               value="<%= typeof listing !== 'undefined' ? listing.location : '' %>" 
+               placeholder="Street address, city, state" required>
+        <small class="form-text text-muted">We'll convert this to geographic coordinates automatically</small>
+        <div class="invalid-feedback">Please provide a valid physical location</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Create Listing</button>
+    </form>
+  </div>
+</div>
+
+<!-- Client-side Validation -->
+<script>
+(() => {
+  'use strict'
+  
+  const forms = document.querySelectorAll('.needs-validation')
+  const locationInput = document.getElementById('location')
+
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      // Additional location validation
+      if (locationInput.value.trim().length < 5) {
+        locationInput.classList.add('is-invalid')
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>

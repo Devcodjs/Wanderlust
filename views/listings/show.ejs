@@ -1,0 +1,117 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+  <!-- Listing Details -->
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="mb-3"><%= listing.title %></h1>
+      <img src="<%= listing.image.url %>" class="img-fluid rounded mb-4" alt="Property image">
+      
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">About this property</h5>
+          <p class="card-text"><%= listing.description %></p>
+          
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Price:</strong> ₹<%= listing.price.toLocaleString("en-IN") %>/night
+            </li>
+            <li class="list-group-item">
+              <strong>Location:</strong> <%= listing.location %>, <%= listing.country %>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Owner Controls -->
+      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+        <div class="d-grid gap-2 d-md-block mb-4">
+          <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">Edit Listing</a>
+          <form class="d-inline" method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+            <button type="submit" class="btn btn-outline-danger">Delete Listing</button>
+          </form>
+        </div>
+      <% } %>
+
+      <!-- Reviews Section -->
+      <div class="mt-5">
+        <h4>Guest Reviews</h4>
+        
+        <% if(listing.reviews.length > 0) { %>
+          <div class="row">
+            <% listing.reviews.forEach(function(review) { %>
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h5 class="card-title mb-0"><%= review.author.username %></h5>
+                      <div class="starability-result" data-rating="<%= review.rating %>"></div>
+                    </div>
+                    <p class="card-text"><%= review.comment %></p>
+                    <% if(currUser && review.author._id.equals(currUser._id)) { %>
+                      <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete Review</button>
+                      </form>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No reviews yet. Be the first to leave one!</p>
+        <% } %>
+
+        <!-- New Review Form -->
+        <% if(currUser) { %>
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">Leave a Review</h5>
+              <form action="/listings/<%= listing._id %>/reviews" method="POST">
+                <div class="mb-3">
+                  <label class="form-label">Rating</label>
+                  <div class="starability-basic">
+                    <input type="radio" id="rate5" name="review[rating]" value="5" required>
+                    <label for="rate5">5 stars</label>
+                    <input type="radio" id="rate4" name="review[rating]" value="4">
+                    <label for="rate4">4 stars</label>
+                    <input type="radio" id="rate3" name="review[rating]" value="3">
+                    <label for="rate3">3 stars</label>
+                    <input type="radio" id="rate2" name="review[rating]" value="2">
+                    <label for="rate2">2 stars</label>
+                    <input type="radio" id="rate1" name="review[rating]" value="1">
+                    <label for="rate1">1 star</label>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="comment" class="form-label">Comments</label>
+                  <textarea name="review[comment]" id="comment" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+              </form>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Map Section -->
+    <div class="col-md-4">
+      <div class="card sticky-top" style="top: 20px">
+        <div class="card-body">
+          <h5 class="card-title">Location</h5>
+          <div id="map" style="height: 300px; border-radius: 8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize map
+  const mapToken = '<%= process.env.MAP_TOKEN %>';
+  const coordinates = '<%- JSON.stringify(listing.geometry.coordinates) %>';
+</script>
+<script src="/js/map.js"></script>
