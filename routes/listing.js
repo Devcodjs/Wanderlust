@@ -9,31 +9,73 @@ const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
 const listingController = require("../controllers/listings.js");
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const geocoder = mbxGeocoding({ accessToken: process.env.MAP_TOKEN });
+
+
 
 // Enhanced validation middleware
-const validateListing = (req, res, next) => {
-  // Handle file upload
-  if (req.file) {
-    req.body.listing.image = {
-      url: req.file.path,
-      filename: req.file.filename
-    };
-  } else if (!req.body.listing.image?.url) {
-    // Set default image if none provided
-    req.body.listing.image = {
-      url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      filename: "defaultListing"
-    };
-  }
+const validateListing = async (req, res, next) => {
+  // console.log("control reached validateListing middleware");
+  try {
+    req.body.listing = req.body.listing || {};
 
-  // Validate with Joi schema
-  const { error } = listingSchema.validate(req.body);
-  if (error) {
-    const errMsg = error.details.map((el) => el.message).join(", ");
-    return next(new ExpressError(400, errMsg));
-  }
-  next();
+    // Attempt to geocode location
+    let geometry;
+    try {
+      const geoData = await geocoder
+        .forwardGeocode({
+          query: req.body.listing.location,
+          limit: 1,
+        })
+        .send();
+
+      if (geoData.body.features.length) {
+        geometry = geoData.body.features[0].geometry;
+      } else {
+        throw new Error("Invalid location");
+      }
+    } catch (e) {
+      // Use default coordinates (India Gate, Delhi)
+      geometry = {
+        type: "Point",
+        coordinates: [77.2295, 28.6129],
+      };
+    }
+
+    // Attach geometry
+    req.body.listing.geometry = geometry;
+    // Ensure image is handled correctly
+    req.body.listing.image = req.body.listing.image || {};
+    // If an image is uploaded, set the image object
+    if (req.file) {
+      req.body.listing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+    } else {
+      // Ensure listing.image always exists
+      console.log("No image uploaded, using default image");
+      if (!req.body.listing.image || !req.body.listing.image.url) {
+        req.body.listing.image = {
+          url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=800&q=60",
+          filename: "defaultListing",
+        };
+      }
+    }
+    const { error } = listingSchema.validate(req.body);
+    if (error) {
+      console.error("Validation error:", error.details);
+      const errMsg = error.details.map((el) => el.message).join(", ");
+      return next(new ExpressError(400, errMsg));
+    }
+    next();
+  } catch (err) {
+    console.error("Error in validateListing middleware:", err);
+    next(err);
+  }
 };
+
 
 // Improved route configuration
 router.route("/")
@@ -42,7 +84,7 @@ router.route("/")
   )
   .post(
     isLoggedIn,
-    upload.single("listing[image]"),  // Correct field name for multer
+    upload.single("image"),  // Correct field name for multer
     validateListing,
     wrapAsync(listingController.createListing)
   );

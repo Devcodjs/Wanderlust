@@ -18,7 +18,7 @@ module.exports.createReview = async (req, res, next) => {
     req.flash("success", "Review successfully created!");
     res.redirect(`/listings/${listing._id}`);
   } catch (err) {
-    next(err);
+    next(err); 
   }
 };
 

@@ -61,43 +61,24 @@ module.exports.showListing = async (req, res, next) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-  try {
-    // 1. Add geocoding logic first
-    const geoData = await geocodingClient.forwardGeocode({
-      query: req.body.listing.location, // Address from form
-      limit: 1
-    }).send();
+try{
+  const newListing  = new Listing({
+    ...req.body.listing,
+    owner:req.user._id,
+  });
 
-    // 2. Validate geocoding response
-    if (!geoData.body.features || geoData.body.features.length === 0) {
-      req.flash("error", "Invalid location address");
-      return res.redirect("/listings/new");
-    }
+   await newListing.save();
+   req.flash("success","Listing created successfully!");
+   res.redirect("/listings");
 
-    // 3. Fix image handling
-    const image = req.file ? {
-      url: req.file.path,
-      filename: req.file.filename
-    } : {
-      url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-      filename: "defaultListing"
-    };
+} catch (err){
+   next(err);
+}
 
-    // 4. Create listing with geocoded data
-    const newListing = new Listing({
-      ...req.body.listing,
-      image,
-      owner: req.user._id,
-      geometry: geoData.body.features[0].geometry // Use geoData here
-    });
-    
-    await newListing.save();
-    req.flash("success", "Listing created successfully!");
-    res.redirect("/listings");
-  } catch (err) {
-    next(err);
-  }
+
+
 };
+
 module.exports.updateListing = async (req, res, next) => {
   try {
     let listing = await Listing.findById(req.params.id);
