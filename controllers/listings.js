@@ -4,7 +4,7 @@ const geocodingClient = mbxGeocoding({ accessToken:process.env.MAP_TOKEN });
 
 module.exports.index = async (req, res, next) => {
   try {
-    const allListings = await Listing.find({});
+    const allListings = await Listing.find({}).populate("author");
     res.render("listings/index", { allListings });
   } catch (err) {
     next(err);
@@ -33,18 +33,28 @@ module.exports.renderEditForm = async (req, res, next) => {
 module.exports.showListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id)
+      .populate("owner")
       .populate({
         path: "reviews",
-        populate: { path: "author" }
-      })
-      .populate("owner");
+        populate: [
+          { path: "author" },
+          { path: "listing" }
+        ]
+      });
 
     if (!listing) {
       req.flash("error", "Listing not found");
       return res.redirect("/listings");
     }
+
+    // Handle deleted users
+    if (!listing.owner) listing.owner = { username: "Deleted User" };
     
-    res.render("listings/show", { listing });
+    res.render("listings/show", {
+      listing,
+      currentUser: res.locals.currentUser
+    });
+    
   } catch (err) {
     next(err);
   }
@@ -52,7 +62,19 @@ module.exports.showListing = async (req, res, next) => {
 
 module.exports.createListing = async (req, res, next) => {
   try {
-    // Fix image handling
+    // 1. Add geocoding logic first
+    const geoData = await geocodingClient.forwardGeocode({
+      query: req.body.listing.location, // Address from form
+      limit: 1
+    }).send();
+
+    // 2. Validate geocoding response
+    if (!geoData.body.features || geoData.body.features.length === 0) {
+      req.flash("error", "Invalid location address");
+      return res.redirect("/listings/new");
+    }
+
+    // 3. Fix image handling
     const image = req.file ? {
       url: req.file.path,
       filename: req.file.filename
@@ -61,11 +83,12 @@ module.exports.createListing = async (req, res, next) => {
       filename: "defaultListing"
     };
 
+    // 4. Create listing with geocoded data
     const newListing = new Listing({
       ...req.body.listing,
       image,
       owner: req.user._id,
-      geometry: response.body.features[0].geometry
+      geometry: geoData.body.features[0].geometry // Use geoData here
     });
     
     await newListing.save();
@@ -75,7 +98,6 @@ module.exports.createListing = async (req, res, next) => {
     next(err);
   }
 };
-
 module.exports.updateListing = async (req, res, next) => {
   try {
     let listing = await Listing.findById(req.params.id);
