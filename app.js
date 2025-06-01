@@ -20,8 +20,7 @@ const reviewRouter = require("./routes/review");
 const listingsRouter = require("./routes/listing");
 const userRouter = require("./routes/user");
 
-const dbUrl = "mongodb+srv://jumansaikia30:WZ4AwxGCMeQnT9xE@cluster0.pltz9u3.mongodb.net/?retryWrites=true&w=majority&ssl=true&appName=Cluster0";
-
+const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 // Database connection
 mongoose
   .connect(dbUrl)
