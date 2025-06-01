@@ -24,7 +24,7 @@
       </div>
 
       <!-- Owner Controls -->
-      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+      <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)) { %>
         <div class="d-grid gap-2 d-md-block mb-4">
           <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">Edit Listing</a>
           <form class="d-inline" method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
@@ -112,6 +112,6 @@
 <script>
   // Initialize map
   const mapToken = '<%= process.env.MAP_TOKEN %>';
-  const coordinates = '<%- JSON.stringify(listing.geometry.coordinates) %>';
+  const coordinates = '<%- JSON.stringify(coordinates) %>';
 </script>
 <script src="/js/map.js"></script>

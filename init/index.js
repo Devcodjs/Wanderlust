@@ -1,8 +1,13 @@
+
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const mongoose = require("mongoose");
 const initData = require("./data.js");
 const Listing = require("../models/listing.js");
 
-const MONGO_URL = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlut";
+const MONGO_URL = "mongodb+srv://jumansaikia30:WZ4AwxGCMeQnT9xE@cluster0.pltz9u3.mongodb.net/?retryWrites=true&w=majority&ssl=true&appName=Cluster0";
 
 async function main() {
   await mongoose.connect(MONGO_URL);

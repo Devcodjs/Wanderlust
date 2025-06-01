@@ -1,10 +1,10 @@
 const Listing = require("../models/listing");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const geocodingClient = mbxGeocoding({ accessToken:process.env.MAP_TOKEN });
+const geocodingClient = mbxGeocoding({ accessToken: process.env.MAP_TOKEN });
 
 module.exports.index = async (req, res, next) => {
   try {
-    const allListings = await Listing.find({}).populate("author");
+    const allListings = await Listing.find({});
     res.render("listings/index", { allListings });
   } catch (err) {
     next(err);
@@ -33,50 +33,58 @@ module.exports.renderEditForm = async (req, res, next) => {
 module.exports.showListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id)
-      .populate("owner")
       .populate({
         path: "reviews",
-        populate: [
-          { path: "author" },
-          { path: "listing" }
-        ]
-      });
-
+        populate: { path: "author" }
+      })
+      .populate("owner");
+      
     if (!listing) {
       req.flash("error", "Listing not found");
       return res.redirect("/listings");
     }
 
-    // Handle deleted users
-    if (!listing.owner) listing.owner = { username: "Deleted User" };
+    // Get current user from locals
+    const currUser = res.locals.currentUser;
     
-    res.render("listings/show", {
-      listing,
-      currentUser: res.locals.currentUser
+    // Get coordinates
+    const coordinates = listing.geometry.coordinates;
+    
+    res.render("listings/show", { 
+      listing, 
+      currUser: res.locals.currentUser,  // Pass currUser to view
+      coordinates 
     });
-    
   } catch (err) {
     next(err);
   }
 };
 
 module.exports.createListing = async (req, res, next) => {
-try{
-  const newListing  = new Listing({
-    ...req.body.listing,
-    owner:req.user._id,
-  });
+  try {
+    // Geocode location
+    const response = await geocodingClient.forwardGeocode({
+      query: req.body.listing.location,
+      limit: 1
+    }).send();
 
-   await newListing.save();
-   req.flash("success","Listing created successfully!");
-   res.redirect("/listings");
-
-} catch (err){
-   next(err);
-}
-
-
-
+    const coordinates = response.body.features[0].geometry.coordinates;
+    
+    const newListing = new Listing({
+      ...req.body.listing,
+      geometry: {
+        type: "Point",
+        coordinates
+      },
+      owner: req.user._id,
+    });
+    
+    await newListing.save();  
+    req.flash("success", "Listing created successfully!");
+    res.redirect("/listings");
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports.updateListing = async (req, res, next) => {
@@ -85,6 +93,19 @@ module.exports.updateListing = async (req, res, next) => {
     if (!listing) {
       req.flash("error", "Listing not found");
       return res.redirect("/listings");
+    }
+
+    // Geocode only if location changed
+    if (req.body.listing.location !== listing.location) {
+      const response = await geocodingClient.forwardGeocode({
+        query: req.body.listing.location,
+        limit: 1
+      }).send();
+      
+      listing.geometry = {
+        type: "Point",
+        coordinates: response.body.features[0].geometry.coordinates
+      };
     }
 
     if (req.file) {

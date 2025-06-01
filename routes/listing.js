@@ -12,8 +12,6 @@ const listingController = require("../controllers/listings.js");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const geocoder = mbxGeocoding({ accessToken: process.env.MAP_TOKEN });
 
-
-
 // Enhanced validation middleware
 const validateListing = async (req, res, next) => {
   // console.log("control reached validateListing middleware");
@@ -73,57 +71,48 @@ const validateListing = async (req, res, next) => {
   } catch (err) {
     console.error("Error in validateListing middleware:", err);
     next(err);
-  }
+  }
 };
 
-
 // Improved route configuration
-router.route("/")
+router
+  .route("/")
   .get(
-    wrapAsync(listingController.index)  // Make sure controller uses .populate()
+    wrapAsync(listingController.index) // Make sure controller uses .populate()
   )
   .post(
     isLoggedIn,
-    upload.single("image"),  // Correct field name for multer
+    upload.single("image"),
     validateListing,
     wrapAsync(listingController.createListing)
   );
 
 // Search route
-router.get('/search', 
-  wrapAsync(listingController.searchListings)
-);
+router.get("/search", wrapAsync(listingController.searchListings));
 
 // Form rendering routes
-router.get("/new", 
-  isLoggedIn, 
-  listingController.renderNewForm
-);
-
+router.get("/new", isLoggedIn, listingController.renderNewForm);
 
 // Single listing operations
-router.route("/:id")
+router
+  .route("/:id")
   .get(
-    wrapAsync(listingController.showListing)  // Ensure populate() for reviews
+    wrapAsync(listingController.showListing) // Ensure populate() for reviews
   )
   .put(
     isLoggedIn,
     isOwner,
-    upload.single("image"),  // Same field name for updates
+    upload.single("image"), // Same field name for updates
     validateListing,
     wrapAsync(listingController.updateListing)
   )
-  .delete(
-    isLoggedIn, 
-    isOwner, 
-    wrapAsync(listingController.deleteListing)
-  );
+  .delete(isLoggedIn, isOwner, wrapAsync(listingController.deleteListing));
 
-
-router.get("/:id/edit",
+router.get(
+  "/:id/edit",
   isLoggedIn,
   isOwner,
   wrapAsync(listingController.renderEditForm)
 );
 
-module.exports = router;
+module.exports = router;

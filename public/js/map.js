@@ -1,14 +1,22 @@
-    mapboxgl.accessToken = mapToken;    
-    const map = new mapboxgl.Map({
-      container: "map", // container ID
-      center: listing.geometry.coordinates, // starting position [lng, lat]. Note that lat must be set between -90 and 90
-      zoom: 9, // starting zoom
-    });
+// Initialize the map
+if (typeof coordinates !== 'undefined' && coordinates.length === 2) {
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: coordinates,
+    zoom: 10
+  });
 
-    const marker = new mapboxgl.Marker({color : "red"})
-    .setLngLat(listing.geometry.coordinates)
-    .setPopup(new mapboxgl.Popup({offset: 25, className: 'my-class'})
-    .setHTML(
-      `<h4>${listing.location}</h4><p>Exact Location provided after booking</p>`
-    ))
+  // Add marker
+  new mapboxgl.Marker({ color: 'red' })
+    .setLngLat(coordinates)
+    .setPopup(
+      new mapboxgl.Popup({ offset: 25 })
+        .setHTML(`<h5>${document.querySelector('h1').textContent}</h5>`)
+    )
     .addTo(map);
+} else {
+  console.error('Invalid coordinates:', coordinates);
+  document.getElementById('map').innerHTML = 
+    '<p class="text-danger">Map could not be loaded. Invalid location data.</p>';
+}
