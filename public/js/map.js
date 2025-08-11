@@ -17,8 +17,11 @@ if (typeof coordinates === 'string') {
   parsedCoordinates = coordinates;
 }
 
+console.log(parsedCoordinates);
+
 if (typeof coordinates !== 'undefined' && Array.isArray(parsedCoordinates) && parsedCoordinates.length === 2) {
-  mapboxgl.accessToken = process.env.MAP_TOKEN;
+  mapboxgl.accessToken = mapToken;
+  console.log("tok"+mapboxgl.accessToken);
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v12',
