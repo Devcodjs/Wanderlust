@@ -99,10 +99,10 @@
 
     <!-- Map Section -->
     <div class="col-md-4">
-      <div class="card sticky-top" style="top: 20px">
+      <div class="card " style="top: 64px">
         <div class="card-body">
           <h5 class="card-title">Location</h5>
-          <div id="map" style="height: 300px; border-radius: 8px"></div>
+          <div id="map" style="height: 400px; width: 410px; border-radius: 10px"></div>
         </div>
       </div>
     </div>
@@ -114,4 +114,5 @@
   const mapToken = '<%= process.env.MAP_TOKEN %>';
   const coordinates = '<%- JSON.stringify(coordinates) %>';
 </script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
 <script src="/js/map.js"></script>

@@ -49,7 +49,7 @@ module.exports.showListing = async (req, res, next) => {
     
     // Get coordinates
     const coordinates = listing.geometry.coordinates;
-    
+    console.log(coordinates)
     res.render("listings/show", { 
       listing, 
       currUser: res.locals.currentUser,  // Pass currUser to view
