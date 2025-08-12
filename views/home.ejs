@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wanderlust - Discover Extraordinary Places</title>
+    
+    <!-- Bootstrap 5.3+ -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS - Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="#" data-aos="fade-right">
+                <i class="fas fa-compass"></i>
+                <span>Wanderlust</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stays">Stays</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary-custom ms-2" href="/login">Sign In</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+            <div class="floating-elements">
+                <div class="floating-element" data-speed="0.5"></div>
+                <div class="floating-element" data-speed="0.8"></div>
+                <div class="floating-element" data-speed="0.3"></div>
+            </div>
+        </div>
+        
+        <div class="container hero-content">
+            <div class="row min-vh-100 align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                        Discover
+                        <span class="gradient-text">Extraordinary</span>
+                        Places
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
+                        Experience the world's most unique accommodations, from luxury villas to cozy treehouses. Your perfect stay awaits.
+                    </p>
+                    
+                    <!-- Enhanced Search Form -->
+                    <div class="search-form-container" data-aos="fade-up" data-aos-delay="300">
+                        <div class="glass-card">
+                            <form class="search-form">
+                                <div class="search-grid">
+                                    <div class="search-field">
+                                        <label class="search-label">Where</label>
+                                        <input type="text" placeholder="Search destinations" class="search-input" id="destination">
+                                        <i class="fas fa-map-marker-alt search-icon"></i>
+                                    </div>
+                                    <div class="search-divider"></div>
+                                    <div class="search-field">
+                                        <label class="search-label">Check-in</label>
+                                        <input type="date" class="search-input" id="checkin">
+                                        <i class="fas fa-calendar search-icon"></i>
+                                    </div>
+                                    <div class="search-divider"></div>
+                                    <div class="search-field">
+                                        <label class="search-label">Check-out</label>
+                                        <input type="date" class="search-input" id="checkout">
+                                        <i class="fas fa-calendar search-icon"></i>
+                                    </div>
+                                    <div class="search-divider"></div>
+                                    <div class="search-field">
+                                        <label class="search-label">Guests</label>
+                                        <select class="search-input" id="guests">
+                                            <option>1 guest</option>
+                                            <option>2 guests</option>
+                                            <option>3 guests</option>
+                                            <option>4+ guests</option>
+                                        </select>
+                                        <i class="fas fa-user search-icon"></i>
+                                    </div>
+                                    <button type="submit" class="search-button">
+                                        <i class="fas fa-search"></i>
+                                        Search
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="quick-actions" data-aos="fade-up" data-aos-delay="400">
+                        <span class="quick-text">Popular: </span>
+                        <button class="quick-btn">Beach Houses</button>
+                        <button class="quick-btn">Mountain Cabins</button>
+                        <button class="quick-btn">City Apartments</button>
+                        <button class="quick-btn">Unique Stays</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="500">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">Why Choose Wanderlust?</h2>
+                <p class="section-subtitle">Experience travel like never before with our premium platform</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <h4 class="feature-title">Global Network</h4>
+                        <p class="feature-description">Access over 100,000 unique properties across 190+ countries worldwide</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <h4 class="feature-title">Verified & Safe</h4>
+                        <p class="feature-description">Every property is personally verified with 24/7 customer support</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4 class="feature-title">Handpicked Selection</h4>
+                        <p class="feature-description">Curated by travel experts for unforgettable experiences</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4 class="feature-title">Easy Booking</h4>
+                        <p class="feature-description">Book instantly with flexible cancellation policies</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="feature-title">Community Driven</h4>
+                        <p class="feature-description">Real reviews and personalized recommendations</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-card glass-card h-100">
+                        <div class="feature-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h4 class="feature-title">Best Price Guarantee</h4>
+                        <p class="feature-description">Exclusive member discounts up to 25% off</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Stays Section -->
+    <section id="stays" class="stays-section py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">Featured Stays</h2>
+                <p class="section-subtitle">Discover our most popular and unique accommodations</p>
+            </div>
+            
+            <div class="stays-carousel" id="staysCarousel">
+                <div class="carousel-container" data-aos="fade-up" data-aos-delay="200">
+                    <div class="carousel-track" id="carouselTrack">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+                
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next-btn" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section py-5">
+        <div class="container">
+            <div class="section-header text-center mb-5" data-aos="fade-up">
+                <h2 class="section-title">What Travelers Say</h2>
+                <p class="section-subtitle">Real experiences from our global community</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card glass-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-content">
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"Wanderlust transformed my travel planning completely. The platform is intuitive, properties are verified, and booking is seamless!"</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b332c1c9?auto=format&fit=crop&w=150&q=80" alt="Sarah Chen" class="author-image">
+                            <div class="author-info">
+                                <h5 class="author-name">Sarah Chen</h5>
+                                <p class="author-role">Travel Blogger</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card glass-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-content">
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"As a digital nomad, Wanderlust has become my go-to platform. Quality is consistently excellent, and customer service is outstanding."</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Marco Rodriguez" class="author-image">
+                            <div class="author-info">
+                                <h5 class="author-name">Marco Rodriguez</h5>
+                                <p class="author-role">Digital Nomad</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card glass-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testimonial-content">
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">"The unique properties provide perfect backdrops for photography. From treehouses to overwater bungalows, every stay is an adventure!"</p>
+                        <div class="testimonial-author">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80" alt="Emma Thompson" class="author-image">
+                            <div class="author-info">
+                                <h5 class="author-name">Emma Thompson</h5>
+                                <p class="author-role">Adventure Photographer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="cta-background">
+            <div class="cta-overlay"></div>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center" data-aos="zoom-in">
+                    <h2 class="cta-title">Ready for Your Next Adventure?</h2>
+                    <p class="cta-subtitle">Join millions of travelers who trust Wanderlust for their perfect getaway</p>
+                    <div class="cta-buttons">
+                        <a href="/signup" class="btn btn-primary-custom btn-lg me-3">Start Exploring</a>
+                        <a href="#stays" class="btn btn-outline-white btn-lg">Browse Stays</a>
+                    </div>
+                    <div class="cta-stats">
+                        <div class="stat">
+                            <div class="stat-number">2M+</div>
+                            <div class="stat-label">Happy Travelers</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">100K+</div>
+                            <div class="stat-label">Properties</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">190+</div>
+                            <div class="stat-label">Countries</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo">
+                        <i class="fas fa-compass"></i>
+                        <span>Wanderlust</span>
+                    </a>
+                    <p class="footer-description">Discover extraordinary places and create unforgettable memories with the world's most trusted travel platform.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Wanderlust. All rights reserved. Made with ❤️ for travelers worldwide.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Action Button -->
+    <div class="floating-chat" id="floatingChat" data-aos="fade-up" data-aos-delay="1000">
+        <button class="floating-btn">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div class="chat-tooltip">Need help? Chat with us!</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="/js/app.js"></script>
+
+    <!-- Data for JavaScript -->
+    <script id="appData" type="application/json">
+    {
+        "stays": [
+            {
+                "name": "Beachside Paradise Villa",
+                "location": "Bali, Indonesia",
+                "price": "$450/night",
+                "rating": "4.9",
+                "reviews": "127",
+                "image": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+                "features": ["Ocean View", "Private Pool", "WiFi"]
+            },
+            {
+                "name": "Mountain Luxury Chalet",
+                "location": "Swiss Alps, Switzerland", 
+                "price": "$650/night",
+                "rating": "4.8",
+                "reviews": "89",
+                "image": "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
+                "features": ["Mountain View", "Fireplace", "Ski Access"]
+            },
+            {
+                "name": "Desert Glamping Experience",
+                "location": "Sahara, Morocco",
+                "price": "$320/night",
+                "rating": "4.7", 
+                "reviews": "156",
+                "image": "https://images.unsplash.com/photo-1539650116574-75c0c6d73bb6?auto=format&fit=crop&w=800&q=80",
+                "features": ["Stargazing", "Camel Rides", "Traditional Meals"]
+            },
+            {
+                "name": "Overwater Bungalow",
+                "location": "Maldives",
+                "price": "$890/night",
+                "rating": "5.0",
+                "reviews": "203",
+                "image": "https://images.unsplash.com/photo-1551524164-6cf2ac531fb4?auto=format&fit=crop&w=800&q=80",
+                "features": ["Crystal Waters", "Snorkeling", "Spa Access"]
+            },
+            {
+                "name": "TreeHouse Retreat",
+                "location": "Costa Rica",
+                "price": "$280/night",
+                "rating": "4.6",
+                "reviews": "94",
+                "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+                "features": ["Jungle View", "Adventure Tours", "Eco-Friendly"]
+            },
+            {
+                "name": "City Penthouse Suite",
+                "location": "Tokyo, Japan",
+                "price": "$780/night",
+                "rating": "4.9",
+                "reviews": "167",
+                "image": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&w=800&q=80",
+                "features": ["City Views", "Modern Design", "Metro Access"]
+            }
+        ]
+    }
+    </script>
+</body>
+</html>

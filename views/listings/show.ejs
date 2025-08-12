@@ -1,118 +1,1836 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="container mt-4">
-  <!-- Listing Details -->
-  <div class="row">
-    <div class="col-md-8">
-      <h1 class="mb-3"><%= listing.title %></h1>
-      <img src="<%= listing.image.url %>" class="img-fluid rounded mb-4" alt="Property image">
-      
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title">About this property</h5>
-          <p class="card-text"><%= listing.description %></p>
-          
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <strong>Price:</strong> ₹<%= listing.price.toLocaleString("en-IN") %>/night
-            </li>
-            <li class="list-group-item">
-              <strong>Location:</strong> <%= listing.location %>, <%= listing.country %>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Owner Controls -->
-      <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)) { %>
-        <div class="d-grid gap-2 d-md-block mb-4">
-          <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">Edit Listing</a>
-          <form class="d-inline" method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-            <button type="submit" class="btn btn-outline-danger">Delete Listing</button>
-          </form>
-        </div>
-      <% } %>
-
-      <!-- Reviews Section -->
-      <div class="mt-5">
-        <h4>Guest Reviews</h4>
-        
-        <% if(listing.reviews.length > 0) { %>
-          <div class="row">
-            <% listing.reviews.forEach(function(review) { %>
-              <div class="col-md-6 mb-3">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="card-title mb-0"><%= review.author.username %></h5>
-                      <div class="starability-result" data-rating="<%= review.rating %>"></div>
+<div class="listing-show-container">
+    <!-- Hero Section -->
+    <div class="listing-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="hero-content">
+                        <div class="hero-breadcrumb" data-aos="fade-up">
+                            <a href="/listings" class="breadcrumb-link">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to listings
+                            </a>
+                        </div>
+                        <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                            <%= listing.title %>
+                        </h1>
+                        <div class="hero-location" data-aos="fade-up" data-aos-delay="200">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <%= listing.location %>, <%= listing.country %>
+                        </div>
                     </div>
-                    <p class="card-text"><%= review.comment %></p>
-                    <% if(currUser && review.author._id.equals(currUser._id)) { %>
-                      <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete Review</button>
-                      </form>
-                    <% } %>
-                  </div>
                 </div>
-              </div>
-            <% }) %>
-          </div>
-        <% } else { %>
-          <p class="text-muted">No reviews yet. Be the first to leave one!</p>
-        <% } %>
-
-        <!-- New Review Form -->
-        <% if(currUser) { %>
-          <div class="card mt-4">
-            <div class="card-body">
-              <h5 class="card-title">Leave a Review</h5>
-              <form action="/listings/<%= listing._id %>/reviews" method="POST">
-                <div class="mb-3">
-                  <label class="form-label">Rating</label>
-                  <div class="starability-basic">
-                    <input type="radio" id="rate5" name="review[rating]" value="5" required>
-                    <label for="rate5">5 stars</label>
-                    <input type="radio" id="rate4" name="review[rating]" value="4">
-                    <label for="rate4">4 stars</label>
-                    <input type="radio" id="rate3" name="review[rating]" value="3">
-                    <label for="rate3">3 stars</label>
-                    <input type="radio" id="rate2" name="review[rating]" value="2">
-                    <label for="rate2">2 stars</label>
-                    <input type="radio" id="rate1" name="review[rating]" value="1">
-                    <label for="rate1">1 star</label>
-                  </div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="comment" class="form-label">Comments</label>
-                  <textarea name="review[comment]" id="comment" class="form-control" rows="3" required></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Submit Review</button>
-              </form>
             </div>
-          </div>
-        <% } %>
-      </div>
+        </div>
     </div>
 
-    <!-- Map Section -->
-    <div class="col-md-4">
-      <div class="card " style="top: 64px">
-        <div class="card-body">
-          <h5 class="card-title">Location</h5>
-          <div id="map" style="height: 400px; width: 410px; border-radius: 10px"></div>
+    <!-- Main Content -->
+    <div class="container listing-content">
+        <div class="row">
+            <!-- Left Column - Details -->
+            <div class="col-lg-8">
+                <!-- Image Gallery -->
+                <div class="image-gallery" data-aos="fade-up">
+                    <div class="main-image">
+                        <img src="<%= listing.image.url %>" 
+                             class="img-fluid" 
+                             alt="<%= listing.title %>"
+                             id="mainImage">
+                        <div class="image-overlay">
+                            <button class="btn-favorite" id="favoriteBtn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="btn-share" id="shareBtn">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Details -->
+                <div class="property-details glass-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="details-header">
+                        <h2 class="details-title">About this property</h2>
+                        <div class="price-display">
+                            <span class="price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                            <span class="price-period">per night</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-description">
+                        <p><%= listing.description %></p>
+                    </div>
+
+                    <div class="property-amenities">
+                        <h3 class="amenities-title">What this place offers</h3>
+                        <div class="amenities-grid">
+                            <div class="amenity-item">
+                                <i class="fas fa-wifi"></i>
+                                <span>Free WiFi</span>
+                            </div>
+                            <div class="amenity-item">
+                                <i class="fas fa-parking"></i>
+                                <span>Free parking</span>
+                            </div>
+                            <div class="amenity-item">
+                                <i class="fas fa-snowflake"></i>
+                                <span>Air conditioning</span>
+                            </div>
+                            <div class="amenity-item">
+                                <i class="fas fa-utensils"></i>
+                                <span>Kitchen</span>
+                            </div>
+                            <div class="amenity-item">
+                                <i class="fas fa-swimming-pool"></i>
+                                <span>Pool</span>
+                            </div>
+                            <div class="amenity-item">
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Gym</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Owner Controls -->
+                <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)) { %>
+                    <div class="owner-controls glass-card" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="controls-title">
+                            <i class="fas fa-cog"></i>
+                            Manage Listing
+                        </h3>
+                        <div class="controls-buttons">
+                            <a href="/listings/<%= listing._id %>/edit" class="btn btn-edit">
+                                <i class="fas fa-edit"></i>
+                                Edit Listing
+                            </a>
+                            <form class="delete-form" method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                                <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this listing?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Delete Listing
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Reviews Section -->
+                <div class="reviews-section" data-aos="fade-up" data-aos-delay="300">
+                    <div class="reviews-header">
+                        <h2 class="reviews-title">
+                            <i class="fas fa-star"></i>
+                            Guest Reviews
+                            <% if(listing.reviews.length > 0) { %>
+                                <span class="reviews-count">(<%= listing.reviews.length %>)</span>
+                            <% } %>
+                        </h2>
+                    </div>
+
+                    <% if(listing.reviews.length > 0) { %>
+                        <div class="reviews-grid">
+                            <% listing.reviews.forEach(function(review) { %>
+                                <div class="review-card glass-card" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="review-header">
+                                        <div class="reviewer-info">
+                                            <div class="reviewer-avatar">
+                                                <%= review.author.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div class="reviewer-details">
+                                                <h4 class="reviewer-name"><%= review.author.username %></h4>
+                                                <div class="review-date">March 2024</div>
+                                            </div>
+                                        </div>
+                                        <div class="review-rating">
+                                            <div class="stars">
+                                                <% for(let i = 1; i <= 5; i++) { %>
+                                                    <i class="fas fa-star <%= i <= review.rating ? 'active' : '' %>"></i>
+                                                <% } %>
+                                            </div>
+                                            <span class="rating-number"><%= review.rating %></span>
+                                        </div>
+                                    </div>
+                                    <div class="review-content">
+                                        <p><%= review.comment %></p>
+                                    </div>
+                                    <% if(currUser && review.author._id.equals(currUser._id)) { %>
+                                        <div class="review-actions">
+                                            <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="delete-review-form">
+                                                <button type="submit" class="btn-delete-review" onclick="return confirm('Delete this review?')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="no-reviews">
+                            <div class="no-reviews-icon">
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <h3>No reviews yet</h3>
+                            <p>Be the first to share your experience!</p>
+                        </div>
+                    <% } %>
+
+                    <!-- New Review Form -->
+                    <% if(currUser) { %>
+                        <div class="review-form-container glass-card" data-aos="fade-up" data-aos-delay="400">
+                            <h3 class="form-title">
+                                <i class="fas fa-pen"></i>
+                                Share your experience
+                            </h3>
+                            <form action="/listings/<%= listing._id %>/reviews" method="POST" class="review-form">
+                                <div class="rating-input-group">
+                                    <label class="form-label">Your Rating</label>
+                                    <div class="star-rating" id="starRating">
+                                        <input type="hidden" name="review[rating]" id="ratingValue" value="5">
+                                        <div class="stars-container">
+                                            <i class="fas fa-star star" data-rating="1"></i>
+                                            <i class="fas fa-star star" data-rating="2"></i>
+                                            <i class="fas fa-star star" data-rating="3"></i>
+                                            <i class="fas fa-star star" data-rating="4"></i>
+                                            <i class="fas fa-star star active" data-rating="5"></i>
+                                        </div>
+                                        <span class="rating-text">Excellent</span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-input-group">
+                                    <label for="comment" class="form-label">Your Review</label>
+                                    <textarea 
+                                        name="review[comment]" 
+                                        id="comment" 
+                                        class="form-control-modern" 
+                                        rows="4" 
+                                        placeholder="Share your thoughts about this place..."
+                                        required></textarea>
+                                    <div class="character-count">
+                                        <span id="charCount">0</span>/500 characters
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-submit-review">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Submit Review
+                                </button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <div class="login-prompt glass-card" data-aos="fade-up" data-aos-delay="400">
+                            <div class="prompt-content">
+                                <h3>Want to leave a review?</h3>
+                                <p>Sign in to share your experience with other travelers</p>
+                                <a href="/login" class="btn btn-login-prompt">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Sign In
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Right Column - Booking & Map -->
+            <div class="col-lg-4">
+                <!-- Sticky Sentinel for detecting when to stop sticky behavior -->
+                <div class="sticky-sentinel" id="stickySentinel"></div>
+                
+                <div class="booking-sidebar" data-aos="fade-left" data-aos-delay="200">
+                    <!-- Booking Card -->
+                    <div class="booking-card glass-card sticky-booking" id="bookingCard">
+                        <div class="booking-header">
+                            <div class="price-info">
+                                <span class="current-price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                                <span class="price-period">per night</span>
+                            </div>
+                            <div class="rating-info">
+                                <i class="fas fa-star"></i>
+                                <span class="rating">4.8</span>
+                                <span class="review-count">(<%= listing.reviews.length %> reviews)</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-form">
+                            <form class="booking-form-container">
+                                <div class="date-inputs">
+                                    <div class="input-group">
+                                        <label class="input-label">Check-in</label>
+                                        <input type="date" class="date-input" id="checkin">
+                                    </div>
+                                    <div class="input-group">
+                                        <label class="input-label">Check-out</label>
+                                        <input type="date" class="date-input" id="checkout">
+                                    </div>
+                                </div>
+                                <div class="guest-input">
+                                    <label class="input-label">Guests</label>
+                                    <select class="guest-select">
+                                        <option value="1">1 guest</option>
+                                        <option value="2">2 guests</option>
+                                        <option value="3">3 guests</option>
+                                        <option value="4">4+ guests</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-reserve">
+                                    <span>Reserve</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </form>
+                            <div class="booking-note">
+                                <i class="fas fa-info-circle"></i>
+                                You won't be charged yet
+                            </div>
+                        </div>
+
+                        <div class="price-breakdown">
+                            <div class="breakdown-item">
+                                <span>₹<%= listing.price.toLocaleString("en-IN") %> × <span id="nightCount">5</span> nights</span>
+                                <span id="subtotalAmount">₹<%= (listing.price * 5).toLocaleString("en-IN") %></span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span>Service fee</span>
+                                <span id="serviceFee">₹<%= Math.round(listing.price * 0.1).toLocaleString("en-IN") %></span>
+                            </div>
+                            <div class="breakdown-divider"></div>
+                            <div class="breakdown-total">
+                                <span>Total</span>
+                                <span id="totalAmount">₹<%= Math.round(listing.price * 5.1).toLocaleString("en-IN") %></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Card -->
+                    <div class="map-card glass-card" id="mapCard">
+                        <div class="map-header">
+                            <h3 class="map-title">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Location
+                            </h3>
+                            <p class="map-address"><%= listing.location %>, <%= listing.country %></p>
+                        </div>
+                        <div class="map-container">
+                            <div id="map"></div>
+                        </div>
+                        <div class="map-footer">
+                            <button class="btn-directions">
+                                <i class="fas fa-directions"></i>
+                                Get directions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
+<!-- FIXED CSS with proper sticky behavior and overlap prevention -->
+<style>
+/* Z-INDEX HIERARCHY FIX */
+.mapboxgl-canvas {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.mapboxgl-control-container {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Base styles */
+.listing-show-container {
+    background: linear-gradient(135deg, 
+        rgba(249, 250, 251, 0.8) 0%, 
+        rgba(243, 244, 246, 0.8) 100%);
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+.listing-hero {
+    background: linear-gradient(135deg, 
+        rgba(254, 66, 77, 0.1) 0%, 
+        rgba(253, 203, 110, 0.1) 100%);
+    padding: 6rem 0 3rem;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.hero-breadcrumb {
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-link {
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.breadcrumb-link:hover {
+    color: #fe424d;
+}
+
+.hero-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    color: #222222;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero-location {
+    color: #6b7280;
+    font-size: 1.25rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hero-location i {
+    color: #fe424d;
+}
+
+.listing-content {
+    padding: 2rem 0;
+    margin-top: -3rem;
+    position: relative;
+    z-index: 3;
+}
+
+/* Image Gallery */
+.image-gallery {
+    margin-bottom: 2rem;
+}
+
+.main-image {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.main-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.main-image img:hover {
+    transform: scale(1.02);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 4;
+}
+
+.btn-favorite,
+.btn-share {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.btn-favorite:hover {
+    background: #fe424d;
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-share:hover {
+    background: #fe424d;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Glass Cards */
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 3;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Property Details */
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.details-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #222222;
+    margin: 0;
+}
+
+.price-display {
+    text-align: right;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fe424d;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.price-period {
+    color: #6b7280;
+    font-size: 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.property-description {
+    margin-bottom: 2rem;
+    line-height: 1.7;
+    color: #4b5563;
+    font-size: 1.1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.amenities-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.amenity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(254, 66, 77, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(254, 66, 77, 0.1);
+    transition: all 0.3s ease;
+}
+
+.amenity-item:hover {
+    background: rgba(254, 66, 77, 0.1);
+    transform: translateY(-2px);
+}
+
+.amenity-item i {
+    color: #fe424d;
+    font-size: 1.25rem;
+    width: 20px;
+    text-align: center;
+}
+
+.amenity-item span {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 500;
+    color: #222222;
+}
+
+/* Owner Controls */
+.controls-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.controls-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #00b894, #00a085);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 184, 148, 0.4);
+    color: white;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #fe424d, #e73c3e);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(254, 66, 77, 0.4);
+}
+
+.delete-form {
+    display: inline;
+}
+
+/* Reviews Section */
+.reviews-header {
+    margin-bottom: 2rem;
+}
+
+.reviews-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222222;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reviews-title i {
+    color: #fbbf24;
+}
+
+.reviews-count {
+    color: #6b7280;
+    font-weight: 400;
+    font-size: 1.25rem;
+}
+
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.review-card {
+    padding: 1.5rem;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fe424d, #fdcb6e);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.reviewer-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222222;
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.review-date {
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.stars i {
+    color: #d1d5db;
+    font-size: 1rem;
+}
+
+.stars i.active {
+    color: #fbbf24;
+}
+
+.rating-number {
+    font-weight: 600;
+    color: #222222;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.review-content p {
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.review-actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete-review {
+    background: none;
+    border: none;
+    color: #fe424d;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.btn-delete-review:hover {
+    color: #e73c3e;
+}
+
+/* No Reviews State */
+.no-reviews {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+}
+
+.no-reviews-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: #fe424d;
+}
+
+.no-reviews h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+}
+
+.no-reviews p {
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Review Form */
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.rating-input-group,
+.comment-input-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.star-rating {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stars-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.star {
+    font-size: 1.75rem;
+    color: #d1d5db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.star.active,
+.star:hover {
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.rating-text {
+    font-weight: 600;
+    color: #fe424d;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.form-control-modern {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.95);
+    resize: vertical;
+    color: #222222;
+}
+
+.form-control-modern:focus {
+    outline: none;
+    border-color: #fe424d;
+    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.1);
+    background: white;
+}
+
+.form-control-modern::placeholder {
+    color: #9ca3af;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.character-count {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.btn-submit-review {
+    background: linear-gradient(135deg, #fe424d, #e73c3e);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.btn-submit-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(254, 66, 77, 0.4);
+}
+
+/* Login Prompt */
+.login-prompt {
+    text-align: center;
+    padding: 2.5rem;
+}
+
+.login-prompt h3 {
+    color: #222222;
+    margin-bottom: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+}
+
+.login-prompt p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.btn-login-prompt {
+    background: linear-gradient(135deg, #fe424d, #e73c3e);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-login-prompt:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(254, 66, 77, 0.4);
+    color: white;
+}
+
+/* FIXED STICKY BOOKING SIDEBAR - PREVENTS OVERLAP */
+.booking-sidebar {
+    position: relative;
+}
+
+/* Sticky Sentinel - invisible element to detect when to stop sticking */
+.sticky-sentinel {
+    position: absolute;
+    top: 0;
+    height: 1px;
+    width: 100%;
+    visibility: hidden;
+}
+
+.sticky-booking {
+    position: relative;
+    z-index: 50;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.sticky-booking.is-sticky {
+    position: fixed;
+    top: 7rem;
+    width: calc(33.333333% - 2rem); /* Adjust based on col-lg-4 width minus padding */
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    z-index: 50;
+}
+
+.sticky-booking.is-sticky.stop-before-map {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    transform: none;
+}
+
+.booking-card {
+    margin-bottom: 1.5rem;
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.current-price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fe424d;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.price-period {
+    color: #6b7280;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.rating-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.rating-info i {
+    color: #fbbf24;
+}
+
+.rating {
+    font-weight: 600;
+    color: #222222;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* BOOKING FORM */
+.booking-form {
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+.booking-form-container {
+    width: 100%;
+}
+
+.date-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-label {
+    font-weight: 600;
+    color: #222222;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.date-input,
+.guest-select {
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    transition: all 0.3s ease;
+    background: white;
+    color: #222222;
+}
+
+.date-input:focus,
+.guest-select:focus {
+    outline: none;
+    border-color: #c78388;
+    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.1);
+    transform: translateY(-1px);
+}
+
+.guest-input {
+    margin-bottom: 1.5rem;
+}
+
+.btn-reserve {
+    width: 100%;
+    background: linear-gradient(135deg, #378cec, #46aee3);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-reserve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(254, 66, 77, 0.4);
+}
+
+.btn-reserve:active {
+    transform: translateY(0);
+}
+
+.btn-reserve:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.booking-note {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(254, 66, 77, 0.05);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(254, 66, 77, 0.1);
+}
+
+.booking-note i {
+    color: #fe424d;
+}
+
+.price-breakdown {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 1rem;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #4b5563;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.breakdown-divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+}
+
+.breakdown-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #222222;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* MAP CARD - FIXED Z-INDEX AND OVERLAP PREVENTION */
+.map-card {
+    position: relative;
+    z-index: 10 !important;
+    margin-top: 2rem;
+}
+
+.map-header {
+    margin-bottom: 1rem;
+}
+
+.map-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.map-title i {
+    color: #68eb51;
+}
+
+.map-address {
+    color: #6b7280;
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.map-container {
+    height: 300px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1 !important;
+}
+
+#map {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.btn-directions {
+    width: 100%;
+    background: white;
+    border: 2px solid #fe424d;
+    color: #df2b37;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-directions:hover {
+    background: #8ae863;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Mobile Responsiveness - CRITICAL FIX */
+@media (max-width: 1199.98px) {
+    .sticky-booking.is-sticky {
+        position: relative !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+        transform: none !important;
+        z-index: auto !important;
+    }
+    
+    .sticky-booking {
+        position: relative !important;
+        top: auto !important;
+        z-index: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .booking-form {
+        position: relative !important;
+        top: auto !important;
+        z-index: auto !important;
+    }
+    
+    .sticky-booking {
+        position: relative !important;
+        top: auto !important;
+        z-index: auto !important;
+    }
+    
+    .sticky-booking.is-sticky {
+        position: relative !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+        transform: none !important;
+        z-index: auto !important;
+    }
+    
+    .listing-hero {
+        padding: 4rem 0 2rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .listing-content {
+        padding: 1rem 0;
+        margin-top: -2rem;
+    }
+    
+    .glass-card {
+        padding: 1.5rem;
+    }
+    
+    .main-image img {
+        height: 300px;
+    }
+    
+    .details-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .price-display {
+        text-align: left;
+    }
+    
+    .amenities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .reviews-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .controls-buttons {
+        flex-direction: column;
+    }
+    
+    .date-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-location {
+        font-size: 1rem;
+    }
+    
+    .image-overlay {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    .btn-favorite,
+    .btn-share {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .glass-card {
+        padding: 1rem;
+    }
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: #61bfea;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: slideInRight 0.3s ease;
+    max-width: 350px;
+    word-wrap: break-word;
+}
+
+.notification.notification-success {
+    background: #10b981;
+}
+
+.notification.notification-error {
+    background: #84c1ec;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+</style>
+
+<!-- Enhanced JavaScript with Fixed Sticky Overlap Prevention -->
 <script>
-  // Initialize map
-  const mapToken = '<%= process.env.MAP_TOKEN %>';
-  const coordinates = '<%- JSON.stringify(coordinates) %>';
+document.addEventListener('DOMContentLoaded', function() {
+    const listingPrice = <%= listing.price %>;
+    
+    // Initialize AOS if available
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out-cubic',
+            once: true,
+            offset: 50
+        });
+    }
+
+    // ENHANCED STICKY BEHAVIOR WITH OVERLAP PREVENTION
+    const bookingCard = document.getElementById('bookingCard');
+    const mapCard = document.getElementById('mapCard');
+    const stickyBooking = document.querySelector('.sticky-booking');
+    
+    if (bookingCard && mapCard && window.innerWidth >= 1200) {
+        let isSticky = false;
+        
+        function handleStickyBooking() {
+            const bookingRect = bookingCard.getBoundingClientRect();
+            const mapRect = mapCard.getBoundingClientRect();
+            const navbarHeight = 112; // 7rem converted to pixels
+            const buffer = 20; // Extra space buffer
+            
+            // Check if booking form should be sticky
+            if (bookingRect.top <= navbarHeight && !isSticky) {
+                // Check if it would overlap with map
+                if (mapRect.top > navbarHeight + bookingCard.offsetHeight + buffer) {
+                    stickyBooking.classList.add('is-sticky');
+                    isSticky = true;
+                }
+            }
+            // Check if booking form should stop being sticky
+            else if (isSticky) {
+                // Stop being sticky if we would overlap with map
+                if (mapRect.top <= navbarHeight + bookingCard.offsetHeight + buffer) {
+                    stickyBooking.classList.remove('is-sticky');
+                    stickyBooking.classList.add('stop-before-map');
+                    isSticky = false;
+                }
+                // Or if we scroll back up past the original position
+                else if (window.scrollY <= bookingCard.parentElement.offsetTop - navbarHeight) {
+                    stickyBooking.classList.remove('is-sticky');
+                    stickyBooking.classList.remove('stop-before-map');
+                    isSticky = false;
+                }
+            }
+            
+            // Remove stop-before-map class if map is far enough
+            if (mapRect.top > navbarHeight + bookingCard.offsetHeight + buffer) {
+                stickyBooking.classList.remove('stop-before-map');
+            }
+        }
+        
+        // Use throttled scroll listener for better performance
+        let ticking = false;
+        function throttledScroll() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    handleStickyBooking();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', throttledScroll);
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 1200) {
+                stickyBooking.classList.remove('is-sticky', 'stop-before-map');
+                isSticky = false;
+            }
+        });
+    }
+
+    // Favorite button toggle
+    const favoriteBtn = document.getElementById('favoriteBtn');
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                this.style.background = '#fe424d';
+                this.style.color = 'white';
+                showNotification('Added to favorites!', 'success');
+                
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                this.style.background = 'rgba(255, 255, 255, 0.9)';
+                this.style.color = '#374151';
+                showNotification('Removed from favorites!', 'info');
+            }
+        });
+    }
+
+    // Share button
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '<%= listing.title %>',
+                    text: 'Check out this amazing place on Wanderlust!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(window.location.href).then(() => {
+                        showNotification('Link copied to clipboard!', 'success');
+                    }).catch(() => {
+                        showNotification('Failed to copy link', 'error');
+                    });
+                } else {
+                    showNotification('Share this link: ' + window.location.href, 'info');
+                }
+            }
+        });
+    }
+
+    // Star rating functionality
+    const stars = document.querySelectorAll('.star');
+    const ratingValue = document.getElementById('ratingValue');
+    const ratingText = document.querySelector('.rating-text');
+    
+    const ratingTexts = {
+        1: 'Poor',
+        2: 'Fair', 
+        3: 'Good',
+        4: 'Very Good',
+        5: 'Excellent'
+    };
+
+    if (stars.length > 0 && ratingValue && ratingText) {
+        stars.forEach((star) => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                ratingValue.value = rating;
+                ratingText.textContent = ratingTexts[rating];
+                
+                stars.forEach((s, i) => {
+                    if (i < rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                stars.forEach((s, i) => {
+                    if (i < rating) {
+                        s.style.color = '#fbbf24';
+                        s.style.transform = 'scale(1.1)';
+                    } else {
+                        s.style.color = '#d1d5db';
+                        s.style.transform = 'scale(1)';
+                    }
+                });
+            });
+        });
+
+        const starContainer = document.querySelector('.stars-container');
+        if (starContainer) {
+            starContainer.addEventListener('mouseleave', function() {
+                const currentRating = parseInt(ratingValue.value);
+                stars.forEach((s, i) => {
+                    if (i < currentRating) {
+                        s.style.color = '#fbbf24';
+                    } else {
+                        s.style.color = '#d1d5db';
+                    }
+                    s.style.transform = 'scale(1)';
+                });
+            });
+        }
+    }
+
+    // Character counter for review textarea
+    const commentTextarea = document.getElementById('comment');
+    const charCount = document.getElementById('charCount');
+    
+    if (commentTextarea && charCount) {
+        commentTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            if (count > 450) {
+                charCount.style.color = '#fe424d';
+            } else if (count > 400) {
+                charCount.style.color = '#f59e0b';
+            } else {
+                charCount.style.color = '#6b7280';
+            }
+            
+            if (count >= 500) {
+                this.value = this.value.substring(0, 500);
+                charCount.textContent = '500';
+            }
+        });
+    }
+
+    // Enhanced booking form with price calculation
+    const checkinInput = document.getElementById('checkin');
+    const checkoutInput = document.getElementById('checkout');
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Set minimum dates
+    if (checkinInput) {
+        checkinInput.setAttribute('min', today);
+        checkinInput.addEventListener('change', function() {
+            if (checkoutInput) {
+                const nextDay = new Date(this.value);
+                nextDay.setDate(nextDay.getDate() + 1);
+                checkoutInput.setAttribute('min', nextDay.toISOString().split('T')[0]);
+                
+                if (!checkoutInput.value) {
+                    checkoutInput.value = nextDay.toISOString().split('T');
+                }
+                
+                calculatePrice();
+                
+                this.style.borderColor = '#10b981';
+                setTimeout(() => {
+                    this.style.borderColor = '#e5e7eb';
+                }, 1000);
+            }
+        });
+    }
+    
+    if (checkoutInput) {
+        checkoutInput.setAttribute('min', today);
+        checkoutInput.addEventListener('change', function() {
+            calculatePrice();
+            
+            this.style.borderColor = '#10b981';
+            setTimeout(() => {
+                this.style.borderColor = '#e5e7eb';
+            }, 1000);
+        });
+    }
+
+    // Price calculation function
+    function calculatePrice() {
+        const checkin = checkinInput?.value;
+        const checkout = checkoutInput?.value;
+        
+        if (checkin && checkout) {
+            const checkinDate = new Date(checkin);
+            const checkoutDate = new Date(checkout);
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+            
+            if (nights > 0) {
+                const subtotal = listingPrice * nights;
+                const serviceFee = Math.round(subtotal * 0.1);
+                const total = subtotal + serviceFee;
+                
+                // Update display
+                document.getElementById('nightCount').textContent = nights;
+                document.getElementById('subtotalAmount').textContent = `₹${subtotal.toLocaleString("en-IN")}`;
+                document.getElementById('serviceFee').textContent = `₹${serviceFee.toLocaleString("en-IN")}`;
+                document.getElementById('totalAmount').textContent = `₹${total.toLocaleString("en-IN")}`;
+            }
+        }
+    }
+
+    // Enhanced booking form submission
+    const bookingFormContainer = document.querySelector('.booking-form-container');
+    if (bookingFormContainer) {
+        bookingFormContainer.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const checkin = checkinInput?.value;
+            const checkout = checkoutInput?.value;
+            const guests = document.querySelector('.guest-select')?.value;
+            
+            if (!checkin || !checkout) {
+                showNotification('Please select check-in and check-out dates', 'error');
+                return;
+            }
+            
+            if (new Date(checkin) >= new Date(checkout)) {
+                showNotification('Check-out date must be after check-in date', 'error');
+                return;
+            }
+            
+            const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24));
+            const total = Math.round(listingPrice * nights * 1.1);
+            
+            const reserveBtn = document.querySelector('.btn-reserve');
+            const originalContent = reserveBtn.innerHTML;
+            
+            reserveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            reserveBtn.disabled = true;
+            
+            setTimeout(() => {
+                showNotification(`Booking confirmed!\nDates: ${checkin} to ${checkout}\nGuests: ${guests}\nTotal: ₹${total.toLocaleString("en-IN")}`, 'success');
+                reserveBtn.innerHTML = originalContent;
+                reserveBtn.disabled = false;
+            }, 2000);
+        });
+    }
+
+    // Guest select enhancement
+    const guestSelect = document.querySelector('.guest-select');
+    if (guestSelect) {
+        guestSelect.addEventListener('change', function() {
+            this.style.borderColor = '#10b981';
+            setTimeout(() => {
+                this.style.borderColor = '#e5e7eb';
+            }, 1000);
+        });
+    }
+
+    // Directions button functionality
+    const directionsBtn = document.querySelector('.btn-directions');
+    if (directionsBtn) {
+        directionsBtn.addEventListener('click', function() {
+            const location = '<%= listing.location %>, <%= listing.country %>';
+            const googleMapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(location)}`;
+            window.open(googleMapsUrl, '_blank');
+        });
+    }
+
+    // Image fullscreen functionality
+    const mainImage = document.getElementById('mainImage');
+    if (mainImage) {
+        mainImage.addEventListener('click', function() {
+            if (this.requestFullscreen) {
+                this.requestFullscreen();
+            } else if (this.webkitRequestFullscreen) {
+                this.webkitRequestFullscreen();
+            } else if (this.msRequestFullscreen) {
+                this.msRequestFullscreen();
+            }
+        });
+        
+        mainImage.title = 'Click to view fullscreen';
+    }
+
+    // Fix map container z-index after map loads
+    setTimeout(() => {
+        const mapCanvas = document.querySelector('.mapboxgl-canvas');
+        const mapContainer = document.querySelector('.mapboxgl-control-container');
+        
+        if (mapCanvas) {
+            mapCanvas.style.position = 'relative';
+            mapCanvas.style.zIndex = '1';
+        }
+        
+        if (mapContainer) {
+            mapContainer.style.position = 'relative';
+            mapContainer.style.zIndex = '2';
+        }
+    }, 1000);
+
+    // Initialize price calculation
+    calculatePrice();
+});
+
+// Enhanced notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 4000);
+}
+
+// Map initialization
+<% if (typeof coordinates !== 'undefined') { %>
+const mapToken = '<%= process.env.MAP_TOKEN %>';
+const coordinates = <%- JSON.stringify(coordinates) %>;
+<% } %>
 </script>
+
+<!-- Include required libraries -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<!-- Include map script -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
 <script src="/js/map.js" defer></script>
