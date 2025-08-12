@@ -1,143 +1,221 @@
-<% layout("/layouts/boilerplate") %> <%= success %>
+<% layout("/layouts/boilerplate") %> 
+<%= success %>
 
 <style>
-  #filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    
-  }
-  .filter {
-    text-align: center;
-    margin-right: 2rem;
-    margin-top: 2rem;
-    opacity: 0.7;
-  }
-  .filter:hover {
-    opacity: 1;
-    cursor: pointer;
-  }
-  .filter p {
-    font-size: 0.8rem;
-  }
- .tax-info{
-   display: none; 
-  }
-  .tax-toggle{
-    border : 1px solid black;
-    border-radius: 1rem;
-    height: 3.25rem;
-    padding: 1rem;
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    margin-top: -4.5rem;
-  }
+/* ===== FILTER BAR ===== */
+#filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  background: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+/* Individual Filter Item */
+.filter {
+  text-align: center;
+  padding: 0.75rem;
+  min-width: 80px;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  flex: 0 0 auto;
+}
+
+.filter i {
+  font-size: 1.2rem;
+  color: #2563eb;
+  margin-bottom: 0.25rem;
+}
+
+.filter p {
+  font-size: 0.8rem;
+  margin: 0;
+  color: #374151;
+}
+
+.filter:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+
+.filter:hover i,
+.filter:hover p {
+  color: #ffffff;
+}
+
+/* ===== TAX TOGGLE ===== */
+.tax-toggle{
+  border: 1px solid #e5e7eb;
+  border-radius: 2rem;
+  padding: 0.5rem 1rem;
+  margin-left: auto;
+  background: #f9fafb;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.tax-toggle label {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* ===== CARD STYLES ===== */
+.listing-card {
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.listing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1rem 1.25rem;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.card-text b {
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+/* Buttons inside card */
+.card-body .btn {
+  font-size: 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-warning {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.btn-warning:hover {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+/* TAX INFO TEXT */
+.tax-info{
+  display: none;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ===== RESPONSIVE GRID ===== */
+.row-cols-custom {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
 </style>
-<!-- <h3>All Listings</h3> -->
+
+<!-- Filters Bar -->
 <div id="filters">
   <div class="filter">
-    <div><i class="fa-solid fa-fire"></i></div>
-    <p>Trending</p>
+    <div><i class="fa-solid fa-fire"></i></div><p>Trending</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-bed"></i></div>
-    <p>Rooms</p>
+    <div><i class="fa-solid fa-bed"></i></div><p>Rooms</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-mountain-city"></i></div>
-    <p>Iconic Cities</p>
+    <div><i class="fa-solid fa-mountain-city"></i></div><p>Iconic Cities</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-mountain"></i></div>
-    <p>Mountains</p>
+    <div><i class="fa-solid fa-mountain"></i></div><p>Mountains</p>
   </div>
   <div class="filter">
-    <div><i class="fa-brands fa-fort-awesome"></i></div>
-    <p>Castles</p>
+    <div><i class="fa-brands fa-fort-awesome"></i></div><p>Castles</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-person-swimming"></i></div>
-    <p>Amazing pools</p>
+    <div><i class="fa-solid fa-person-swimming"></i></div><p>Amazing pools</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-campground"></i></div>
-    <p>Camping</p>
+    <div><i class="fa-solid fa-campground"></i></div><p>Camping</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-cow"></i></div>
-    <p>Farms</p>
+    <div><i class="fa-solid fa-cow"></i></div><p>Farms</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-snowflake"></i></div>
-    <p>Arctic</p>
+    <div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-landmark-dome"></i></div>
-    <p>Domes</p>
+    <div><i class="fa-solid fa-landmark-dome"></i></div><p>Domes</p>
   </div>
   <div class="filter">
-    <div><i class="fa-solid fa-ship"></i></div>
-    <p>Boats</p>
+    <div><i class="fa-solid fa-ship"></i></div><p>Boats</p>
   </div>
+
   <div class="tax-toggle">
-    <div class="form-check-reverse form-switch">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="switchCheckDefault"
-      />
-      <label class="form-check-label" for="switchCheckDefault"
-        >Display total after taxes</label
-      >
+    <div class="form-check form-switch m-0">
+      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" />
+      <label class="form-check-label" for="switchCheckDefault">Show total w/ taxes</label>
     </div>
   </div>
 </div>
 
-<a href="/listings/new" class="btn btn-success mb-3">Create New Listing</a>
+<a href="/listings/new" class="btn btn-primary mt-4 mb-3">
+  <i class="fas fa-plus me-2"></i>Create New Listing
+</a>
 
-<div class="row row-col-lg-3 row-col-md-2 row-col-sm-1 mt-3">
+<!-- Listings Grid -->
+<div class="row-cols-custom">
   <% for(let listing of allListings) { %>
-  <div class="card listing-card" style="width: 20rem">
-    <img
-      src="<%= listing.image.url %>"
-      class="card-img-top"
-      alt="..."
-      style="height: 20rem"
-    />
-    <div class="card-body">
-      <p class="card-text">
-        <b><%= listing.title %></b> <br />
-        &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
-        <i class="tax-info">&nbsp;&nbsp; +18% GST</i>
-      </p>
-      <!-- Added links here -->
-      <div class="mt-2">
-        <a href="/listings/<%= listing._id %>" class="btn btn-primary btn-sm"
-          >Show</a
-        >
-        <a
-          href="/listings/<%= listing._id %>/edit"
-          class="btn btn-warning btn-sm"
-          >Edit</a
-        >
+    <div class="card listing-card">
+      <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height: 14rem" />
+      <div class="card-body">
+        <p class="card-text mb-2">
+          <b><%= listing.title %></b><br/>
+          ₹<%= listing.price.toLocaleString("en-IN") %> / night
+          <i class="tax-info">&nbsp; +18% GST</i>
+        </p>
+        <div class="mt-2">
+          <a href="/listings/<%= listing._id %>" class="btn btn-primary btn-sm"><i class="fas fa-eye me-1"></i>Show</a>
+          <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+        </div>
       </div>
     </div>
-  </div>
   <% } %>
 </div>
 
 <script>
-  let taxSwitch = document.getElementById("switchCheckDefault");
-  taxSwitch.addEventListener("click", () =>{
-  let taxInfo = document.getElementsByClassName("tax-info");
-   for( info of taxInfo){
-    if(info.style.display != "inline"){
-      info.style.display = "inline";
-    }else{
-      info.style.display = "none";
+  // Toggle tax info
+  document.getElementById("switchCheckDefault").addEventListener("click", () => {
+    let taxInfoElements = document.getElementsByClassName("tax-info");
+    for (let info of taxInfoElements) {
+      info.style.display = (info.style.display === "inline") ? "none" : "inline";
     }
-   }
   });
 </script>

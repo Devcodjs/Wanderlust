@@ -1,78 +1,141 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row">
-  <div class="col-8 offset-2">
-    <h3 class="my-4">Create New Listing</h3>
-    <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+<div class="row justify-content-center my-5">
+  <div class="col-lg-8">
+    <div class="form-card p-4 p-md-5 shadow-lg rounded-4 bg-white">
+      <h3 class="mb-4 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i>Create New Listing</h3>
       
       <!-- Error Display -->
       <% if (typeof error !== 'undefined' && error.length) { %>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <%= error %>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+          <i class="fas fa-exclamation-circle me-2"></i> <%= error %>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <% } %>
 
-      <!-- Title -->
-      <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <input id="title" name="listing[title]" class="form-control" 
-               value="<%= typeof listing !== 'undefined' ? listing.title : '' %>" 
-               required>
-        <div class="invalid-feedback">Please provide a title</div>
-      </div>
+      <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+        
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label fw-semibold">Title</label>
+          <input id="title" name="listing[title]" class="form-control custom-input" 
+                value="<%= typeof listing !== 'undefined' ? listing.title : '' %>" 
+                required>
+          <div class="invalid-feedback">Please provide a title</div>
+        </div>
 
-      <!-- Description -->
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea id="description" name="listing[description]" class="form-control" rows="3" 
-                  required><%= typeof listing !== 'undefined' ? listing.description : '' %></textarea>
-        <div class="invalid-feedback">Please provide a description</div>
-      </div>
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label fw-semibold">Description</label>
+          <textarea id="description" name="listing[description]" 
+                    class="form-control custom-input" rows="3" required><%= typeof listing !== 'undefined' ? listing.description : '' %></textarea>
+          <div class="invalid-feedback">Please provide a description</div>
+        </div>
 
-      <!-- Image Upload -->
-      <div class="mb-3">
-        <label for="image" class="form-label">Property Image</label>
-        <input id="image" name="image" type="file" class="form-control">
-        <div class="invalid-feedback">Please select an image (JPEG/PNG)</div>
-      </div>
+        <!-- Image Upload -->
+        <div class="mb-4">
+          <label for="image" class="form-label fw-semibold">Property Image</label>
+          <input id="image" name="image" type="file" class="form-control custom-file">
+          <div class="invalid-feedback">Please select an image (JPEG/PNG)</div>
+        </div>
 
-      <!-- Price & Country -->
-      <div class="row g-3 mb-3">
-        <div class="col-md-4">
-          <label for="price" class="form-label">Price</label>
-          <div class="input-group">
-            <span class="input-group-text">₹</span>
-            <input id="price" name="listing[price]" type="number" class="form-control" 
-                   value="<%= typeof listing !== 'undefined' ? listing.price : '' %>" 
-                   min="0" required>
+        <!-- Price & Country -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label for="price" class="form-label fw-semibold">Price</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">₹</span>
+              <input id="price" name="listing[price]" type="number" 
+                     class="form-control custom-input" 
+                     value="<%= typeof listing !== 'undefined' ? listing.price : '' %>" 
+                     min="0" required>
+            </div>
+            <div class="invalid-feedback">Please provide a valid price</div>
           </div>
-          <div class="invalid-feedback">Please provide a valid price</div>
+
+          <div class="col-md-8">
+            <label for="country" class="form-label fw-semibold">Country</label>
+            <input id="country" name="listing[country]" class="form-control custom-input" 
+                  value="<%= typeof listing !== 'undefined' ? listing.country : '' %>" 
+                  required>
+            <div class="invalid-feedback">Please provide a country</div>
+          </div>
         </div>
 
-        <div class="col-md-8">
-          <label for="country" class="form-label">Country</label>
-          <input id="country" name="listing[country]" class="form-control" 
-                 value="<%= typeof listing !== 'undefined' ? listing.country : '' %>" 
-                 required>
-          <div class="invalid-feedback">Please provide a country</div>
+        <!-- Location (Critical for Geometry) -->
+        <div class="mb-4">
+          <label for="location" class="form-label fw-semibold">Exact Location</label>
+          <input id="location" name="listing[location]" class="form-control custom-input" 
+                value="<%= typeof listing !== 'undefined' ? listing.location : '' %>" 
+                placeholder="Street address, city, state" required>
+          <small class="form-text text-muted">We'll convert this to geographic coordinates automatically</small>
+          <div class="invalid-feedback">Please provide a valid physical location</div>
         </div>
-      </div>
 
-      <!-- Location (Critical for Geometry) -->
-      <div class="mb-4">
-        <label for="location" class="form-label">Exact Location</label>
-        <input id="location" name="listing[location]" class="form-control" 
-               value="<%= typeof listing !== 'undefined' ? listing.location : '' %>" 
-               placeholder="Street address, city, state" required>
-        <small class="form-text text-muted">We'll convert this to geographic coordinates automatically</small>
-        <div class="invalid-feedback">Please provide a valid physical location</div>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Create Listing</button>
-    </form>
+        <!-- Submit Button -->
+        <div class="text-end">
+          <button type="submit" class="btn btn-create px-4">
+            <i class="fas fa-plus me-2"></i>Create Listing
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
+
+<style>
+/* FORM CARD */
+.form-card {
+  border: none;
+}
+
+/* INPUTS */
+.custom-input {
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  background-color: #f9fafb;
+}
+
+.custom-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  background-color: #fff;
+}
+
+/* FILE INPUT */
+.custom-file {
+  padding: 0.45rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* BUTTONS */
+.btn-create {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+}
+
+/* ALERT BOX */
+.alert {
+  border-left: 5px solid #dc2626;
+}
+
+/* LABELS */
+.form-label {
+  color: #374151;
+}
+</style>
 
 <!-- Client-side Validation -->
 <script>
@@ -89,7 +152,6 @@
         event.stopPropagation()
       }
 
-      // Additional location validation
       if (locationInput.value.trim().length < 5) {
         locationInput.classList.add('is-invalid')
         event.preventDefault()
